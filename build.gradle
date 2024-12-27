@@ -1,0 +1,80 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'java'
+    id 'maven-publish'
+}
+
+version = project.findProperty("${project.name}-version") ?: 'unspecified'
+group = 'io.github.mcengine'
+
+allprojects {
+    group = 'io.github.mcengine'
+
+    apply plugin: 'java'
+    apply plugin: 'com.github.johnrengelman.shadow'
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+
+        maven {
+            url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+
+            // As of Gradle 5.1, you can limit this to only those
+            // dependencies you expect from it
+            content {
+                includeGroup 'org.bukkit'
+                includeGroup 'org.spigotmc'
+            }
+        }
+        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+
+        // HeadDatabaseAPI
+        maven { url = 'https://repo.codemc.org/repository/maven-public' }
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    // Disable the 'jar' task if needed
+    tasks.named('jar').configure {
+        enabled = false
+    }
+
+    // Get submodules info, ensure version property is not null
+    version = project.findProperty("${project.name}-version") ?: 'unspecified'
+
+	shadowJar {
+		archiveClassifier = null
+	}
+
+    // Bukkit server specific configuration
+    if (project.name == 'spigotmc') {
+        processResources {
+            def props = [version: version]
+            inputs.properties(props)
+            filteringCharset 'UTF-8'
+            filesMatching('plugin.yml') {
+                expand(props)
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation project(path: ':spigotmc', configuration: 'shadow')
+}
+
+shadowJar {
+    version = null
+    archiveClassifier = null
+    archiveBaseName.set('MCEngineBackPack')
+}
+
+// Disable the 'jar' task if needed
+tasks.named('jar').configure {
+    enabled = false
+}
+build.dependsOn(shadowJar)
