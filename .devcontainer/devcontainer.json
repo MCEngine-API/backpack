@@ -1,0 +1,25 @@
+{
+    "name": "Java Gradle",
+    "image": "mcr.microsoft.com/devcontainers/java:17",
+    "features": {
+        "ghcr.io/devcontainers/features/java:1": {
+        "version": "none",
+        "installMaven": "false",
+        "installGradle": "true"
+        },
+        "ghcr.io/devcontainers-contrib/features/ant-sdkman:2": {}
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "workbench.colorTheme": "Default Dark Modern"
+            },
+            "extensions": [
+                "ms-azuretools.vscode-docker",
+                "eamodio.gitlens",
+                "alefragnani.bookmarks",
+                "vscjava.vscode-java-pack"
+            ]
+        }
+    }
+}
