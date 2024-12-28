@@ -1,6 +1,6 @@
 package io.github.mcengine.api.backpack.command;
 
-import io.github.mcengine.api.backpack.listener.MCEngineBackPackApiUtil;
+import io.github.mcengine.api.MCEngineBackPackApi;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,16 +20,17 @@ public class MCEngineBackPackApiCommand implements CommandExecutor {
 
         if (command.getName().equalsIgnoreCase("givebackpack")) {
             if (args.length < 2) {
-                player.sendMessage("§eUsage: /givebackpack <head id || texture> <size>");
+                player.sendMessage("§eUsage: /givebackpack <head_id || texture> <size>");
                 return true;
             }
 
             String texture = args[0];
             int rows;
+
             try {
                 rows = Integer.parseInt(args[1]);
             } catch (NumberFormatException e) {
-                player.sendMessage("§cInvalid size. Please provide a valid number.");
+                player.sendMessage("§cInvalid size. Please provide a valid number between 1 and 6.");
                 return true;
             }
 
@@ -39,14 +40,15 @@ public class MCEngineBackPackApiCommand implements CommandExecutor {
             }
 
             int size = rows * 9;
-            ItemStack backpack = MCEngineBackPackApiUtil.getBackpack(texture, size);
+            ItemStack backpack = MCEngineBackPackApi.getBackPack(texture, size);
+
             if (backpack == null) {
-                player.sendMessage("§cFailed to create the backpack. Please check the texture ID.");
+                player.sendMessage("§cFailed to create the backpack. Please check the texture ID or contact an administrator.");
                 return true;
             }
 
             player.getInventory().addItem(backpack);
-            player.sendMessage("§aBackpack given!");
+            player.sendMessage("§aBackpack added to your inventory!");
             return true;
         }
 
