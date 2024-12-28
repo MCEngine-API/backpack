@@ -6,6 +6,6 @@ description: MCEngine BackPack
 api-version: 1.18
 softdepend: [HeadDatabaseAPI]
 commands:
-  givebackpack:
+  backpack:
     description: Gives a player a backpack.
-    usage: /givebackpack <head id> <size>
+    usage: /backpack <create> <hdb id||Texture base64> <size>
