@@ -12,12 +12,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-public class MCEngineBackPackApi {
+public class MCEngineBackPackApiUtil {
     private final JavaPlugin plugin;
     private static final String BACKPACK_KEY = "backpack_key";
     private static final String SIZE_KEY = "size_key";
 
-    public MCEngineBackPackApi(JavaPlugin plugin) {
+    public MCEngineBackPackApiUtil(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 
