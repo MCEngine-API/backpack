@@ -50,6 +50,47 @@ subprojects {
 		archiveClassifier = null
 	}
 
+    if (project.name == 'mcengine-backpack-api') {
+        apply plugin: 'maven-publish'
+        publishing {
+            repositories {
+                maven {
+                    name = 'GitHubPackages'
+                    url = uri('https://maven.pkg.github.com/MCEngine/backpack')
+                    credentials {
+                        username = System.getenv('GIT_USER')
+                        password = System.getenv('MCENGINE_GITHUB_TOKEN_PKG')
+                    }
+                }
+            }
+            publications {
+                mavenJava(MavenPublication) {
+                    artifact(tasks.named('shadowJar').get())
+
+                    pom {
+                        name = 'MCEnginebackpack'
+                        url = 'https://github.com/MCEngine/backpack'
+
+                        scm {
+                            connection = 'scm:git:git://github.com/MCEngine/backpack.git'
+                            developerConnection = 'scm:git:ssh://github.com:MCEngine/backpack.git'
+                            url = 'https://github.com/MCEngine/backpack'
+                        }
+
+                        developers {
+                            developer {
+                                id = 'JetsadaWijit'
+                                name = 'Jetsada Wijit'
+                                email = 'jetsadawijit@outlook.com'
+                                url = 'https://github.com/JetsadaWijit'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Bukkit server specific configuration
     if (project.name == 'spigotmc') {
         processResources {
@@ -64,6 +105,8 @@ subprojects {
 }
 
 dependencies {
+    implementation project(path: ':mcengine-backpack-api', configuration: 'shadow')
+
     implementation project(path: ':spigotmc', configuration: 'shadow')
 }
 

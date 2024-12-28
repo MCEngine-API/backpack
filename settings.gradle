@@ -1,3 +1,4 @@
 rootProject.name = 'mcengine-backpack'
 
+include 'mcengine-backpack-api'
 include 'spigotmc'

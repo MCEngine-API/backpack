@@ -1,0 +1,11 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    // Spigot API
+    compileOnly 'org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT'
+
+    // HeadDatabaseAPI
+    compileOnly 'com.arcaniax:HeadDatabase-API:1.3.2' 
+}
