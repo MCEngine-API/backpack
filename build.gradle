@@ -60,7 +60,7 @@ subprojects {
 
         // Change the JAR name if path starts with 'server:{sub-projectName}'
         if (project.path.startsWith(':server') || project.name == 'common') {
-            archiveBaseName.set("MCEngine-${project.name}")
+            archiveBaseName.set("MCEngine-BackPack-${project.name}")
         } else {
             archiveBaseName.set(project.name)
         }
