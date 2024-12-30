@@ -25,7 +25,7 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
 
         if (command.getName().equalsIgnoreCase("backpack")) {
             if (args.length < 2) {
-                player.sendMessage("§eUsage: /backpack <create || get> <hdb id> [size]");
+                player.sendMessage("§eUsage: /backpack <create> <hdb id> [size]");
                 return true;
             }
 
@@ -62,19 +62,8 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
                     player.sendMessage("§aBackpack created and added to your inventory!");
                     break;
 
-                case "get":
-                    ItemStack existingBackpack = backpackApi.getBackpack(texture);
-                    if (existingBackpack == null) {
-                        player.sendMessage("§cNo backpack found with the given head ID.");
-                        return true;
-                    }
-
-                    player.getInventory().addItem(existingBackpack);
-                    player.sendMessage("§aBackpack retrieved and added to your inventory!");
-                    break;
-
                 default:
-                    player.sendMessage("§eUsage: /backpack <create || get> <hdb id> [size]");
+                    player.sendMessage("§eUsage: /backpack <create> <hdb id> [size]");
                     break;
             }
             return true;

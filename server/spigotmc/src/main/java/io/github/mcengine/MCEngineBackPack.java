@@ -11,7 +11,7 @@ public class MCEngineBackPack extends JavaPlugin {
     public void onEnable() {
         getLogger().info("MCEngineBackPack has been enabled.");
         // Register Command
-        getCommand("givebackpack").setExecutor(new MCEngineBackPackCommonCommand(new MCEngineBackPackApi(this)));
+        getCommand("backpack").setExecutor(new MCEngineBackPackCommonCommand(new MCEngineBackPackApi(this)));
         // Register Listener
         getServer().getPluginManager().registerEvents(new MCEngineBackPackCommonListener(this), this);
     }
