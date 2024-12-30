@@ -1,4 +1,4 @@
-package io.github.mcenginecommon.backkpack.commands;
+package io.github.mcengine.common.backpack.command;
 
 import io.github.mcengine.api.MCEngineBackPackApi;
 import org.bukkit.command.Command;
