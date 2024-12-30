@@ -11,5 +11,5 @@ dependencies {
 }
 
 shadowJar {
-    archiveBaseName.set("MCEngine-BackPack-Api")
+    archiveBaseName.set("MCEngineBackPack-Api")
 }
