@@ -5,5 +5,7 @@ plugins {
 dependencies {
     compileOnly project(':mcengine-backpack-api')
 
+    compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
+
     compileOnly 'org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT'
 }
