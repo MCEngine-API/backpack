@@ -21,7 +21,7 @@ public class MCEngineBackPackApi {
     private static final String BACKPACK_KEY = "backpack";
     private static final String SIZE_KEY = "backpack_size";
     private static final String UNIQUE_ID_KEY = "unique_id";
-    private static final String BACKPACK_TITLE = "§6Backpack";
+    public static final String BACKPACK_TITLE = "§6Backpack";
 
     public MCEngineBackPackApi(JavaPlugin plugin) {
         this.plugin = plugin;
