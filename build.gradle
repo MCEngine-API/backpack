@@ -43,12 +43,47 @@ subprojects {
         enabled = false
     }
 
+    def excludeBuildProjects = [':server']
+    if (project.path in excludeBuildProjects) {
+        tasks.matching { it.name == 'shadowJar' }.configureEach {
+            enabled = false
+        }
+    }
+
     // Get submodules info, ensure version property is not null
     version = project.findProperty("${project.name}-version") ?: 'unspecified'
 
 	shadowJar {
+        version = null
 		archiveClassifier = null
+        destinationDirectory.set(file("${rootProject.buildDir}/libs"))
+
+        // Change the JAR name if path starts with 'server:{sub-projectName}'
+        if (project.path.startsWith(':server') || project.name == 'common') {
+            archiveBaseName.set("MCEngine-${project.name}")
+        } else {
+            archiveBaseName.set(project.name)
+        }
 	}
+
+    if (project.path.startsWith(':server:')) {
+        dependencies {
+            implementation project(path: ':mcengine-backpack-api', configuration: 'shadow')
+            implementation project(path: ':common', configuration: 'shadow')
+        }
+    }
+
+    // Bukkit server specific configuration
+    if (project.name == 'spigotmc') {
+        processResources {
+            def props = [version: version]
+            inputs.properties(props)
+            filteringCharset 'UTF-8'
+            filesMatching('plugin.yml') {
+                expand(props)
+            }
+        }
+    }
 
     if (project.name == 'mcengine-backpack-api') {
         apply plugin: 'maven-publish'
@@ -90,24 +125,19 @@ subprojects {
             }
         }
     }
-
-    // Bukkit server specific configuration
-    if (project.name == 'spigotmc') {
-        processResources {
-            def props = [version: version]
-            inputs.properties(props)
-            filteringCharset 'UTF-8'
-            filesMatching('plugin.yml') {
-                expand(props)
-            }
-        }
-    }
 }
 
 dependencies {
     implementation project(path: ':mcengine-backpack-api', configuration: 'shadow')
+    implementation project(path: ':common', configuration: 'shadow')
 
-    implementation project(path: ':spigotmc', configuration: 'shadow')
+    // Dynamically include all server projects
+    rootProject.subprojects.each { subproject ->
+        if (subproject.name != 'mcengine-backpack-api' && subproject.name != 'common') {
+            def serverProjectPath = subproject.path.startsWith(':server') ? subproject.path : ":server:${subproject.name}"
+            implementation project(path: serverProjectPath, configuration: 'shadow')
+        }
+    }
 }
 
 shadowJar {

@@ -9,3 +9,7 @@ dependencies {
     // HeadDatabaseAPI
     compileOnly 'com.arcaniax:HeadDatabase-API:1.3.2' 
 }
+
+shadowJar {
+    archiveBaseName.set("MCEngine-BackPack-Api")
+}
