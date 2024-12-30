@@ -34,6 +34,11 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
 
             switch (action) {
                 case "create":
+                    if (!player.hasPermission("mcengine.backpack.create")) {
+                        player.sendMessage("§cYou do not have permission to create backpacks.");
+                        return true;
+                    }
+
                     if (args.length < 3) {
                         player.sendMessage("§eUsage: /backpack create <hdb id> <size>");
                         return true;
