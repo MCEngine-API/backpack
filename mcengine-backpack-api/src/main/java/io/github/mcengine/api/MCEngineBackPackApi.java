@@ -1,6 +1,9 @@
 package io.github.mcengine.api;
 
-import java.io.StringReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.UUID;
 import me.arcaniax.hdb.api.DatabaseLoadEvent;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
@@ -14,6 +17,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
 
 public class MCEngineBackPackApi {
 
@@ -59,12 +64,12 @@ public class MCEngineBackPackApi {
             // Default to a new backpack with a title and a default size
             return Bukkit.createInventory(null, 27, "Default Backpack");
         }
-    
+
         PersistentDataContainer data = meta.getPersistentDataContainer();
         // Fetch the serialized inventory data using BACKPACK_KEY
         String serializedData = data.get(new NamespacedKey(plugin, BACKPACK_KEY), PersistentDataType.STRING);
         int size = data.getOrDefault(new NamespacedKey(plugin, SIZE_KEY), PersistentDataType.INTEGER, 9);
-    
+
         // Create the inventory with the size and the backpack name
         Inventory backpack = Bukkit.createInventory(null, size, meta.getDisplayName());
         if (serializedData != null && !serializedData.isEmpty()) {
@@ -73,7 +78,7 @@ public class MCEngineBackPackApi {
             backpack.setContents(items);
         }
         return backpack;
-    }    
+    }
 
     public boolean isBackpack(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return false;
@@ -88,44 +93,58 @@ public class MCEngineBackPackApi {
 
         PersistentDataContainer data = meta.getPersistentDataContainer();
         String serializedData = serializeInventory(inventory.getContents());
-        data.set(new NamespacedKey(plugin, BACKPACK_KEY), PersistentDataType.STRING, serializedData);
+        if (serializedData != null && !serializedData.isEmpty()) {
+            data.set(new NamespacedKey(plugin, BACKPACK_KEY), PersistentDataType.STRING, serializedData);
+        }
 
         headItem.setItemMeta(meta);
     }
 
-    private String serializeInventory(ItemStack[] items) {
+    public String serializeInventory(ItemStack[] items) {
+        StringBuilder serialized = new StringBuilder();
         try {
-            StringBuilder serialized = new StringBuilder();
             for (ItemStack item : items) {
                 if (item == null) {
                     serialized.append("null;");
                 } else {
-                    YamlConfiguration config = new YamlConfiguration();
-                    config.set("item", item);
-                    serialized.append(config.saveToString()).append(";");
+                    try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                         BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream)) {
+
+                        dataOutput.writeObject(item);
+                        serialized.append(Base64.getEncoder().encodeToString(outputStream.toByteArray())).append(";");
+                    }
                 }
             }
-            return serialized.toString();
         } catch (Exception e) {
-            e.printStackTrace();
-            return "";
+            plugin.getLogger().severe("Serialization error: " + e.getMessage());
+            return null;
         }
+        return serialized.toString();
     }
-    
-    private ItemStack[] deserializeInventory(String data, int size) {
+
+    public ItemStack[] deserializeInventory(String data, int size) {
+        ItemStack[] items = new ItemStack[size];
         try {
-            String[] serializedItems = data.split(";");
-            ItemStack[] items = new ItemStack[size];
+            if (data == null || data.isEmpty()) {
+                plugin.getLogger().info("Serialized data is empty. Returning default empty inventory.");
+                return items;
+            }
+
+            String[] serializedItems = data.split(";", -1);
             for (int i = 0; i < serializedItems.length && i < size; i++) {
-                if (!serializedItems[i].equals("null")) {
-                    YamlConfiguration config = YamlConfiguration.loadConfiguration(new StringReader(serializedItems[i]));
-                    items[i] = config.getItemStack("item");
+                if (!"null".equals(serializedItems[i]) && !serializedItems[i].isEmpty()) {
+                    try (ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(serializedItems[i]));
+                         BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream)) {
+
+                        items[i] = (ItemStack) dataInput.readObject();
+                    } catch (Exception e) {
+                        plugin.getLogger().warning("Error deserializing item at index " + i + ": " + e.getMessage());
+                    }
                 }
             }
-            return items;
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ItemStack[size];
+            plugin.getLogger().severe("Deserialization error: " + e.getMessage());
         }
+        return items;
     }
 }

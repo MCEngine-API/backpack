@@ -32,43 +32,34 @@ public class MCEngineBackPackCommonListener implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        Inventory inventory = event.getInventory();
-        Player player = (Player) event.getPlayer();
-        ItemStack itemInHand = player.getInventory().getItemInMainHand();
-
-        if (backPackApi.isBackpack(itemInHand)) {
-            backPackApi.saveBackpack(itemInHand, inventory);
-            player.sendMessage("§aBackpack saved successfully!");
+        if (event.getView().getTitle().toLowerCase().contains("Backpack".toLowerCase())) {
+            Player player = (Player) event.getPlayer();
+            ItemStack itemInHand = player.getInventory().getItemInMainHand();
+            if (backPackApi.isBackpack(itemInHand)) {
+                backPackApi.saveBackpack(itemInHand, event.getInventory());
+            }
         }
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        Inventory inventory = event.getClickedInventory();
-        if (inventory == null) return;
-
-        // Check if the clicked inventory is associated with a backpack
-        Player player = (Player) event.getWhoClicked();
-        if (backPackApi.isBackpack(player.getInventory().getItemInMainHand())) {
+        if (event.getView().getTitle().toLowerCase().contains("Backpack".toLowerCase())) {
             ItemStack clickedItem = event.getCurrentItem();
             ItemStack cursorItem = event.getCursor();
 
-            // Prevent placing backpacks inside backpacks
-            if (clickedItem != null && backPackApi.isBackpack(clickedItem)) {
+            if (backPackApi.isBackpack(clickedItem)) {
                 event.setCancelled(true);
-                player.sendMessage("§cYou cannot interact with a backpack!");
-                return;
+                event.getWhoClicked().sendMessage("§cYou cannot interact with a backpack!");
             }
 
             if (cursorItem != null && backPackApi.isBackpack(cursorItem)) {
                 event.setCancelled(true);
-                player.sendMessage("§cYou cannot place a backpack inside another backpack!");
-                return;
+                event.getWhoClicked().sendMessage("§cYou cannot place a backpack inside another backpack!");
             }
 
             if (event.getClick().isShiftClick() && backPackApi.isBackpack(clickedItem)) {
                 event.setCancelled(true);
-                player.sendMessage("§cYou cannot place a backpack inside another backpack!");
+                event.getWhoClicked().sendMessage("§cYou cannot place a backpack inside another backpack!");
             }
         }
     }
@@ -76,11 +67,8 @@ public class MCEngineBackPackCommonListener implements Listener {
     @EventHandler
     public void onPlayerRightClick(PlayerInteractEvent event) {
         if (event.getAction().toString().contains("RIGHT") && event.hasItem() && backPackApi.isBackpack(event.getItem())) {
-            event.setCancelled(true); // Cancel the default right-click behavior
-            Player player = event.getPlayer();
             Inventory backpack = backPackApi.getBackpack(event.getItem());
-            player.openInventory(backpack);
-            player.sendMessage("§aOpening your backpack!");
+            event.getPlayer().openInventory(backpack);
         }
     }
 }
