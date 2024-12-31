@@ -88,10 +88,10 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
                         return true;
                     }
                     
-                    String backpackName = config.getString("name");
+                    String backpackName = config.getString("name").replace("&", "§");
                     String headId = config.getString("head_id");
                     int rows = config.getInt("size");
-                
+
                     if (headId == null || rows <= 0 || rows > 6) {
                         player.sendMessage("§cInvalid backpack data for '" + name + "'.");
                         return true;
