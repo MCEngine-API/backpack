@@ -79,7 +79,7 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
                         player.sendMessage("§eUsage: /backpack get <name>");
                         return true;
                     }
-                
+
                     String name = args[1];
                     YamlConfiguration config = MCEngineBackPackCommonCommandUtil.loadBackpackConfig(name);
                 
@@ -88,8 +88,8 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
                         return true;
                     }
                 
-                    String headId = config.getString(name + ".head_id");
-                    int rows = config.getInt(name + ".size");
+                    String headId = config.getString("head_id");
+                    int rows = config.getInt("size");
                 
                     if (headId == null || rows <= 0 || rows > 6) {
                         player.sendMessage("§cInvalid backpack data for '" + name + "'.");
