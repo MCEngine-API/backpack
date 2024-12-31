@@ -21,7 +21,7 @@ public class MCEngineBackPackCommonCommandUtil {
             return null;
         }
 
-        File file = new File(BASE_PATH + "/head", name + ".yml");
+        File file = new File(BASE_PATH + "/heads", name + ".yml");
         if (!file.exists()) {
             System.out.println("Backpack configuration file not found: " + file.getAbsolutePath());
             return null;
