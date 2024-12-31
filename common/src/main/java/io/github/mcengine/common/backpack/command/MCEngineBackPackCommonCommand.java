@@ -27,7 +27,7 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
 
         if (command.getName().equalsIgnoreCase("backpack")) {
             if (args.length < 2) {
-                player.sendMessage("§eUsage: /backpack <create> <hdb id> [size]");
+                player.sendMessage("§eUsage: /backpack <create||get> <hdb id||name> [size]");
                 return true;
             }
 
@@ -59,7 +59,7 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
                         return true;
                     }
 
-                    ItemStack backpack = backpackApi.createBackpack(texture, size);
+                    ItemStack backpack = backpackApi.createBackpack("§6Backpack", texture, size);
                     if (backpack == null) {
                         player.sendMessage("§cFailed to create backpack. Please check the head ID.");
                         return true;
@@ -87,7 +87,8 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
                         player.sendMessage("§cBackpack data for '" + name + "' does not exist.");
                         return true;
                     }
-                
+                    
+                    String backpackName = config.getString("name");
                     String headId = config.getString("head_id");
                     int rows = config.getInt("size");
                 
@@ -97,7 +98,7 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
                     }
                 
                     int sizeInSlots = rows * 9;
-                    ItemStack retrievedBackpack = backpackApi.createBackpack(headId, sizeInSlots);
+                    ItemStack retrievedBackpack = backpackApi.createBackpack(backpackName, headId, sizeInSlots);
                 
                     if (retrievedBackpack == null) {
                         player.sendMessage("§cFailed to retrieve backpack. Please check the data.");
