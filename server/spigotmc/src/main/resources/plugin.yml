@@ -8,4 +8,4 @@ softdepend: [HeadDatabaseAPI]
 commands:
   backpack:
     description: Gives a player a backpack.
-    usage: /backpack <create> <hdb id> <size>
+    usage: /backpack <create || get > <hdb id || head name> <size>

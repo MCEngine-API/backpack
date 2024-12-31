@@ -1,5 +1,6 @@
 package io.github.mcengine.common.backpack.command;
 
+import io.github.mcengine.common.backpack.command.MCEngineBackPackCommonCommandUtil;
 import io.github.mcengine.api.MCEngineBackPackApi;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -65,6 +66,45 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
 
                     player.getInventory().addItem(backpack);
                     player.sendMessage("§aBackpack created and added to your inventory!");
+                    break;
+
+                case "get":
+                    if (!player.hasPermission("mcengine.backpack.get")) {
+                        player.sendMessage("§cYou do not have permission to get backpacks.");
+                        return true;
+                    }
+                
+                    if (args.length < 2) {
+                        player.sendMessage("§eUsage: /backpack get <name>");
+                        return true;
+                    }
+                
+                    String name = args[1];
+                    YamlConfiguration config = MCEngineBackPackCommonCommandUtil.loadBackpackConfig(name);
+                
+                    if (config == null) {
+                        player.sendMessage("§cBackpack data for '" + name + "' does not exist.");
+                        return true;
+                    }
+                
+                    String headId = config.getString(name + ".head_id");
+                    int rows = config.getInt(name + ".size");
+                
+                    if (headId == null || rows <= 0 || rows > 6) {
+                        player.sendMessage("§cInvalid backpack data for '" + name + "'.");
+                        return true;
+                    }
+                
+                    int sizeInSlots = rows * 9;
+                    ItemStack retrievedBackpack = backpackApi.createBackpack(headId, sizeInSlots);
+                
+                    if (retrievedBackpack == null) {
+                        player.sendMessage("§cFailed to retrieve backpack. Please check the data.");
+                        return true;
+                    }
+                
+                    player.getInventory().addItem(retrievedBackpack);
+                    player.sendMessage("§aBackpack '" + name + "' retrieved and added to your inventory!");
                     break;
 
                 default:
