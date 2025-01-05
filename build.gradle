@@ -140,7 +140,7 @@ dependencies {
 }
 
 shadowJar {
-    version = null
+    version = version
     archiveClassifier = null
     archiveBaseName.set('MCEngineBackPack')
 }
