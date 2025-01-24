@@ -6,8 +6,7 @@
         "version": "none",
         "installMaven": "false",
         "installGradle": "true"
-        },
-        "ghcr.io/devcontainers-contrib/features/ant-sdkman:2": {}
+        }
     },
     "customizations": {
         "vscode": {
