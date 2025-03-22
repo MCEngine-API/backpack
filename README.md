@@ -8,7 +8,7 @@ Depends on the [HeadDatabase](https://www.spigotmc.org/resources/head-database.1
 
 ```cmd
 /backpack create <hbd id> <size>(1-6)
-/backpack get <name>
+/backpack get <name> <size>(1-6)
 ```
 
 # `Member`
