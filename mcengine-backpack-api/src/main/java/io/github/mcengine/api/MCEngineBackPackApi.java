@@ -24,6 +24,7 @@ public class MCEngineBackPackApi {
 
     private final JavaPlugin plugin;
     private static final String BACKPACK_KEY = "backpack";
+private static final String BACKPACK_DATA_KEY = "backpack_data";
     private static final String SIZE_KEY = "backpack_size";
     private static final String UNIQUE_ID_KEY = "unique_id";
 
@@ -67,7 +68,7 @@ public class MCEngineBackPackApi {
 
         PersistentDataContainer data = meta.getPersistentDataContainer();
         // Fetch the serialized inventory data using BACKPACK_KEY
-        String serializedData = data.get(new NamespacedKey(plugin, BACKPACK_KEY), PersistentDataType.STRING);
+        String serializedData = data.get(new NamespacedKey(plugin, BACKPACK_DATA_KEY), PersistentDataType.STRING);
         int size = data.getOrDefault(new NamespacedKey(plugin, SIZE_KEY), PersistentDataType.INTEGER, 9);
 
         // Create the inventory with the size and the backpack name
@@ -94,7 +95,7 @@ public class MCEngineBackPackApi {
         PersistentDataContainer data = meta.getPersistentDataContainer();
         String serializedData = serializeInventory(inventory.getContents());
         if (serializedData != null && !serializedData.isEmpty()) {
-            data.set(new NamespacedKey(plugin, BACKPACK_KEY), PersistentDataType.STRING, serializedData);
+            data.set(new NamespacedKey(plugin, BACKPACK_DATA_KEY), PersistentDataType.STRING, serializedData);
         }
 
         headItem.setItemMeta(meta);
