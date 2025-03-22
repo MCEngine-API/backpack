@@ -93,7 +93,8 @@ subprojects {
                     url = uri('https://maven.pkg.github.com/MCEngine/backpack')
                     credentials {
                         username = System.getenv('GIT_USERNAME')
-                        password = System.getenv('MCENGINE_GITHUB_TOKEN_PKG')
+                        password = System.getenv('MCENGINE_GITHUB_TOKEN_PKG_PUBLISH_BACKPACK') ?:
+                                  System.getenv('MCENGINE_GITHUB_TOKEN_PKG_PUBLISH')
                     }
                 }
             }
@@ -116,7 +117,7 @@ subprojects {
                                 id = 'JetsadaWijit'
                                 name = 'Jetsada Wijit'
                                 email = 'jetsadawijit@outlook.com'
-                                url = 'https://github.com/JetsadaWijit'
+                                url = 'https://jetsadawijit.github.io'
                             }
                         }
                     }
