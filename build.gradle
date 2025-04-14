@@ -92,7 +92,7 @@ subprojects {
                     name = 'GitHubPackages'
                     url = uri('https://maven.pkg.github.com/MCEngine/backpack')
                     credentials {
-                        username = System.getenv('GIT_USERNAME')
+                        username = System.getenv('GIT_USER_NAME')
                         password = System.getenv('MCENGINE_GITHUB_TOKEN_PKG_PUBLISH_BACKPACK') ?:
                                   System.getenv('MCENGINE_GITHUB_TOKEN_PKG_PUBLISH')
                     }
