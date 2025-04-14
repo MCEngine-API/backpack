@@ -156,6 +156,7 @@ shadowJar {
     manifest {
         attributes 'Main-Class': 'io.github.mcengine.app.backpack.BackpackApplication'
     }
+    mergeServiceFiles()
 }
 
 // Disable the 'jar' task if needed
