@@ -57,7 +57,6 @@ subprojects {
 
 	shadowJar {
 		archiveClassifier = null
-        destinationDirectory.set(file("${rootProject.buildDir}/libs"))
 
         // Change the JAR name if path starts with 'server:{sub-projectName}'
         if (project.path.startsWith(':server') || project.name == 'common') {
