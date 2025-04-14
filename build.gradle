@@ -9,6 +9,10 @@ plugins {
 version = project.findProperty("${project.name}-version") ?: 'unspecified'
 group = 'io.github.mcengine'
 
+springBoot {
+    mainClass = 'io.github.mcengine.app.backpack.BackpackApplication'
+}
+
 allprojects {
     group = 'io.github.mcengine'
 
@@ -60,9 +64,9 @@ subprojects {
 
         // Change the JAR name if path starts with 'server:{sub-projectName}'
         if (project.path.startsWith(':server') || project.name == 'common') {
-            archiveBaseName.set("MCEngineBackPack-${project.name}")
+            archiveBaseName = "MCEngineBackPack-${project.name}"
         } else {
-            archiveBaseName.set(project.name)
+            archiveBaseName = project.name
         }
 	}
 
@@ -147,7 +151,11 @@ dependencies {
 shadowJar {
     version = version
     archiveClassifier = null
-    archiveBaseName.set('MCEngineBackPack')
+    archiveBaseName = 'MCEngineBackPack'
+
+    manifest {
+        attributes 'Main-Class': 'io.github.mcengine.app.backpack.BackpackApplication'
+    }
 }
 
 // Disable the 'jar' task if needed
