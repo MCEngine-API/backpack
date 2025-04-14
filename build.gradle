@@ -1,4 +1,6 @@
 plugins {
+    id 'org.springframework.boot' version '3.4.4'
+    id 'io.spring.dependency-management' version '1.1.7'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'java'
     id 'maven-publish'
@@ -6,6 +8,10 @@ plugins {
 
 version = project.findProperty("${project.name}-version") ?: 'unspecified'
 group = 'io.github.mcengine'
+
+springBoot {
+    mainClass = 'io.github.mcengine.app.backpack.BackpackApplication'
+}
 
 allprojects {
     group = 'io.github.mcengine'
@@ -55,13 +61,12 @@ subprojects {
 
 	shadowJar {
 		archiveClassifier = null
-        destinationDirectory.set(file("${rootProject.buildDir}/libs"))
 
         // Change the JAR name if path starts with 'server:{sub-projectName}'
         if (project.path.startsWith(':server') || project.name == 'common') {
-            archiveBaseName.set("MCEngineBackPack-${project.name}")
+            archiveBaseName = "MCEngineBackPack-${project.name}"
         } else {
-            archiveBaseName.set(project.name)
+            archiveBaseName = project.name
         }
 	}
 
@@ -128,6 +133,9 @@ subprojects {
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
     implementation project(path: ':mcengine-backpack-api', configuration: 'shadow')
     implementation project(path: ':common', configuration: 'shadow')
 
@@ -143,7 +151,12 @@ dependencies {
 shadowJar {
     version = version
     archiveClassifier = null
-    archiveBaseName.set('MCEngineBackPack')
+    archiveBaseName = 'MCEngineBackPack'
+
+    manifest {
+        attributes 'Main-Class': 'io.github.mcengine.app.backpack.BackpackApplication'
+    }
+    mergeServiceFiles()
 }
 
 // Disable the 'jar' task if needed
