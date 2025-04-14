@@ -132,7 +132,6 @@ subprojects {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     implementation project(path: ':mcengine-backpack-api', configuration: 'shadow')
     implementation project(path: ':common', configuration: 'shadow')
@@ -144,10 +143,6 @@ dependencies {
             implementation project(path: serverProjectPath, configuration: 'shadow')
         }
     }
-}
-
-test {
-    useJUnitPlatform()
 }
 
 shadowJar {
