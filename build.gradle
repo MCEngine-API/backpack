@@ -8,8 +8,15 @@ plugins {
 
 version = project.findProperty("${project.name}-version") ?: 'unspecified'
 group = 'io.github.mcengine'
-git_organization_name = System.getenv('GIT_ORGANIZATION_NAME')
-git_repository_name = System.getenv('GIT_REPOSITORY_NAME')
+
+ext {
+    git_organization_name = System.getenv('GIT_ORGANIZATION_NAME') ?: 'MCEngine'
+    git_repository_name = System.getenv('GIT_REPOSITORY_NAME') ?: 'backpack'
+    git_user_name = System.getenv('GIT_USER_NAME') ?: 'null'
+    git_user_token = System.getenv('GIT_USER_TOKEN') ?: 'null'
+    git_repository_token = System.getenv('GIT_REPOSITORY_TOKEN') ?: 'null'
+    git_organization_token = System.getenv('GIT_ORGANIZATION_TOKEN') ?: 'null'
+}
 
 springBoot {
     mainClass = 'io.github.mcengine.app.backpack.BackpackApplication'
@@ -97,11 +104,12 @@ subprojects {
             repositories {
                 maven {
                     name = 'GitHubPackages'
-                    url = uri("https://maven.pkg.github.com/${git_organization_name}/${git_repository_name}")
+                    url = uri("https://maven.pkg.github.com/${project.git_organization_name}/${project.git_repository_name}")
                     credentials {
-                        username = System.getenv('GIT_USER_NAME')
-                        password = System.getenv('MCENGINE_GITHUB_TOKEN_PKG_PUBLISH_BACKPACK') ?:
-                                  System.getenv('MCENGINE_GITHUB_TOKEN_PKG_PUBLISH')
+                        username = System.getenv(project.git_user_name)
+                        password = System.getenv(project.git_user_token)
+                                ?: System.getenv(project.git_repository_token)
+                                ?: System.getenv(project.git_organization_token)
                     }
                 }
             }
@@ -111,12 +119,12 @@ subprojects {
 
                     pom {
                         name = 'MCEnginebackpack'
-                        url = "https://github.com/${git_organization_name}/${git_repository_name}"
+                        url = "https://github.com/${project.git_organization_name}/${project.git_repository_name}"
 
                         scm {
-                            connection = "scm:git:git://github.com/${git_organization_name}/${git_repository_name}.git"
-                            developerConnection = "scm:git:ssh://github.com:${git_organization_name}/${git_repository_name}.git"
-                            url = "https://github.com/${git_organization_name}/${git_repository_name}"
+                            connection = "scm:git:git://github.com/${project.git_organization_name}/${project.git_repository_name}.git"
+                            developerConnection = "scm:git:ssh://github.com:${project.git_organization_name}/${project.git_repository_name}.git"
+                            url = "https://github.com/${project.git_organization_name}/${project.git_repository_name}"
                         }
 
                         developers {
