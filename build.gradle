@@ -8,6 +8,8 @@ plugins {
 
 version = project.findProperty("${project.name}-version") ?: 'unspecified'
 group = 'io.github.mcengine'
+git_organization_name = System.getenv('GIT_ORGANIZATION_NAME')
+git_repository_name = System.getenv('GIT_REPOSITORY_NAME')
 
 springBoot {
     mainClass = 'io.github.mcengine.app.backpack.BackpackApplication'
@@ -95,7 +97,7 @@ subprojects {
             repositories {
                 maven {
                     name = 'GitHubPackages'
-                    url = uri('https://maven.pkg.github.com/MCEngine/backpack')
+                    url = uri("https://maven.pkg.github.com/${git_organization_name}/${git_repository_name}")
                     credentials {
                         username = System.getenv('GIT_USER_NAME')
                         password = System.getenv('MCENGINE_GITHUB_TOKEN_PKG_PUBLISH_BACKPACK') ?:
@@ -109,12 +111,12 @@ subprojects {
 
                     pom {
                         name = 'MCEnginebackpack'
-                        url = 'https://github.com/MCEngine/backpack'
+                        url = "https://github.com/${git_organization_name}/${git_repository_name}"
 
                         scm {
-                            connection = 'scm:git:git://github.com/MCEngine/backpack.git'
-                            developerConnection = 'scm:git:ssh://github.com:MCEngine/backpack.git'
-                            url = 'https://github.com/MCEngine/backpack'
+                            connection = "scm:git:git://github.com/${git_organization_name}/${git_repository_name}.git"
+                            developerConnection = "scm:git:ssh://github.com:${git_organization_name}/${git_repository_name}.git"
+                            url = "https://github.com/${git_organization_name}/${git_repository_name}"
                         }
 
                         developers {
