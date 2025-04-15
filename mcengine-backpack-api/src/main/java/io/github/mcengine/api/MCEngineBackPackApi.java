@@ -2,7 +2,6 @@ package io.github.mcengine.api;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
@@ -19,6 +18,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
+/**
+ * MCEngineBackPackApi provides functionality for creating, saving, opening, and managing
+ * backpack items in a Minecraft server using Bukkit.
+ */
 public class MCEngineBackPackApi {
 
     private final JavaPlugin plugin;
@@ -29,6 +32,11 @@ public class MCEngineBackPackApi {
     private final NamespacedKey SIZE_KEY;
     private final NamespacedKey UNIQUE_ID_KEY;
 
+    /**
+     * Constructs a new MCEngineBackPackApi instance.
+     *
+     * @param plugin The JavaPlugin instance.
+     */
     public MCEngineBackPackApi(JavaPlugin plugin) {
         this.plugin = plugin;
         this.BACKPACK_KEY = new NamespacedKey("mcengine", "backpack");
@@ -37,6 +45,14 @@ public class MCEngineBackPackApi {
         this.UNIQUE_ID_KEY = new NamespacedKey("mcengine", "unique_id");
     }
 
+    /**
+     * Creates a backpack ItemStack with the given name, texture ID, and size.
+     *
+     * @param backpackName The display name of the backpack.
+     * @param textureID    The HeadDatabase texture ID for the backpack appearance.
+     * @param size         The size of the backpack inventory.
+     * @return The generated backpack ItemStack.
+     */
     public ItemStack getBackpack(String backpackName, String textureID, int size) {
         ItemStack head;
         try {
@@ -62,6 +78,12 @@ public class MCEngineBackPackApi {
         return head;
     }
 
+    /**
+     * Opens a virtual inventory based on the serialized data of the given backpack item.
+     *
+     * @param headItem The backpack ItemStack.
+     * @return The deserialized inventory with its contents restored.
+     */
     public Inventory openBackpack(ItemStack headItem) {
         ItemMeta meta = headItem.getItemMeta();
         if (meta == null) return Bukkit.createInventory(null, 27, "Default Backpack");
@@ -78,12 +100,24 @@ public class MCEngineBackPackApi {
         return backpack;
     }
 
+    /**
+     * Checks if the given item is a recognized backpack.
+     *
+     * @param item The ItemStack to check.
+     * @return true if the item has the backpack key set; false otherwise.
+     */
     public boolean isBackpack(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return false;
         PersistentDataContainer data = item.getItemMeta().getPersistentDataContainer();
         return data.has(BACKPACK_KEY, PersistentDataType.STRING);
     }
 
+    /**
+     * Saves the inventory contents into the backpack item's metadata.
+     *
+     * @param headItem  The backpack ItemStack to save to.
+     * @param inventory The inventory whose contents are to be saved.
+     */
     public void saveBackpack(ItemStack headItem, Inventory inventory) {
         ItemMeta meta = headItem.getItemMeta();
         if (meta == null) return;
@@ -97,6 +131,12 @@ public class MCEngineBackPackApi {
         headItem.setItemMeta(meta);
     }
 
+    /**
+     * Serializes an array of ItemStacks into a Base64-encoded string for storage.
+     *
+     * @param items The ItemStacks to serialize.
+     * @return The Base64-encoded serialized string.
+     */
     public String serializeInventory(ItemStack[] items) {
         StringBuilder serialized = new StringBuilder();
         try {
@@ -119,6 +159,13 @@ public class MCEngineBackPackApi {
         return serialized.toString();
     }
 
+    /**
+     * Deserializes a Base64-encoded string into an array of ItemStacks.
+     *
+     * @param data The serialized string.
+     * @param size The expected inventory size.
+     * @return An array of ItemStacks restored from the serialized data.
+     */
     public ItemStack[] deserializeInventory(String data, int size) {
         ItemStack[] items = new ItemStack[size];
         try {
