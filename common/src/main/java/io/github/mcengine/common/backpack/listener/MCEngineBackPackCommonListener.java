@@ -67,7 +67,7 @@ public class MCEngineBackPackCommonListener implements Listener {
     @EventHandler
     public void onPlayerRightClick(PlayerInteractEvent event) {
         if (event.getAction().toString().contains("RIGHT") && event.hasItem() && backPackApi.isBackpack(event.getItem())) {
-            Inventory backpack = backPackApi.getBackpack(event.getItem());
+            Inventory backpack = backPackApi.openBackpack(event.getItem());
             event.getPlayer().openInventory(backpack);
         }
     }

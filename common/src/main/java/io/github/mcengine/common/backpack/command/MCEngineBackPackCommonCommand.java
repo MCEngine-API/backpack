@@ -87,7 +87,7 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
         int size = MCEngineBackPackCommonCommandUtil.parseBackpackSize(args[2], player);
         if (size == -1) return;
 
-        ItemStack backpack = backpackApi.createBackpack("§6Backpack", texture, size);
+        ItemStack backpack = backpackApi.getBackpack("§6Backpack", texture, size);
         if (backpack == null) {
             player.sendMessage("§cFailed to create backpack. Please check the head ID.");
             return;
@@ -132,7 +132,7 @@ public class MCEngineBackPackCommonCommand implements CommandExecutor {
         }
 
         int size = rows * 9;
-        ItemStack retrievedBackpack = backpackApi.createBackpack(backpackName, headId, size);
+        ItemStack retrievedBackpack = backpackApi.getBackpack(backpackName, headId, size);
 
         if (retrievedBackpack == null) {
             player.sendMessage("§cFailed to retrieve backpack. Please check the data.");

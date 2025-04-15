@@ -5,12 +5,11 @@ import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
-import me.arcaniax.hdb.api.DatabaseLoadEvent;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -23,19 +22,24 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
 public class MCEngineBackPackApi {
 
     private final JavaPlugin plugin;
-    private static final String BACKPACK_KEY = "backpack";
-    private static final String BACKPACK_DATA_KEY = "backpack_data";
-    private static final String SIZE_KEY = "backpack_size";
-    private static final String UNIQUE_ID_KEY = "unique_id";
+
+    // NamespacedKey constants
+    private final NamespacedKey BACKPACK_KEY;
+    private final NamespacedKey BACKPACK_DATA_KEY;
+    private final NamespacedKey SIZE_KEY;
+    private final NamespacedKey UNIQUE_ID_KEY;
 
     public MCEngineBackPackApi(JavaPlugin plugin) {
         this.plugin = plugin;
+        this.BACKPACK_KEY = new NamespacedKey("mcengine", "backpack");
+        this.BACKPACK_DATA_KEY = new NamespacedKey("mcengine", "backpack_data");
+        this.SIZE_KEY = new NamespacedKey("mcengine", "backpack_size");
+        this.UNIQUE_ID_KEY = new NamespacedKey("mcengine", "unique_id");
     }
 
-    public ItemStack createBackpack(String backpackName, String textureID, int size) {
+    public ItemStack getBackpack(String backpackName, String textureID, int size) {
         ItemStack head;
         try {
-            // Fetch the head from HeadDatabase using the textureID
             HeadDatabaseAPI headDatabaseAPI = new HeadDatabaseAPI();
             head = headDatabaseAPI.getItemHead(textureID);
         } catch (Exception e) {
@@ -48,10 +52,9 @@ public class MCEngineBackPackApi {
             meta.setDisplayName(backpackName);
             PersistentDataContainer data = meta.getPersistentDataContainer();
 
-            // Add unique identifiers and backpack size
-            data.set(new NamespacedKey(plugin, BACKPACK_KEY), PersistentDataType.STRING, "backpack");
-            data.set(new NamespacedKey(plugin, SIZE_KEY), PersistentDataType.INTEGER, size);
-            data.set(new NamespacedKey(plugin, UNIQUE_ID_KEY), PersistentDataType.STRING, UUID.randomUUID().toString());
+            data.set(BACKPACK_KEY, PersistentDataType.STRING, "backpack");
+            data.set(SIZE_KEY, PersistentDataType.INTEGER, size);
+            data.set(UNIQUE_ID_KEY, PersistentDataType.STRING, UUID.randomUUID().toString());
 
             head.setItemMeta(meta);
         }
@@ -59,22 +62,16 @@ public class MCEngineBackPackApi {
         return head;
     }
 
-    public Inventory getBackpack(ItemStack headItem) {
+    public Inventory openBackpack(ItemStack headItem) {
         ItemMeta meta = headItem.getItemMeta();
-        if (meta == null) {
-            // Default to a new backpack with a title and a default size
-            return Bukkit.createInventory(null, 27, "Default Backpack");
-        }
+        if (meta == null) return Bukkit.createInventory(null, 27, "Default Backpack");
 
         PersistentDataContainer data = meta.getPersistentDataContainer();
-        // Fetch the serialized inventory data using BACKPACK_KEY
-        String serializedData = data.get(new NamespacedKey(plugin, BACKPACK_DATA_KEY), PersistentDataType.STRING);
-        int size = data.getOrDefault(new NamespacedKey(plugin, SIZE_KEY), PersistentDataType.INTEGER, 9);
+        String serializedData = data.get(BACKPACK_DATA_KEY, PersistentDataType.STRING);
+        int size = data.getOrDefault(SIZE_KEY, PersistentDataType.INTEGER, 9);
 
-        // Create the inventory with the size and the backpack name
         Inventory backpack = Bukkit.createInventory(null, size, meta.getDisplayName());
         if (serializedData != null && !serializedData.isEmpty()) {
-            // Deserialize the inventory contents
             ItemStack[] items = deserializeInventory(serializedData, size);
             backpack.setContents(items);
         }
@@ -83,9 +80,8 @@ public class MCEngineBackPackApi {
 
     public boolean isBackpack(ItemStack item) {
         if (item == null || !item.hasItemMeta()) return false;
-        ItemMeta meta = item.getItemMeta();
-        PersistentDataContainer data = meta.getPersistentDataContainer();
-        return data.has(new NamespacedKey(plugin, BACKPACK_KEY), PersistentDataType.STRING);
+        PersistentDataContainer data = item.getItemMeta().getPersistentDataContainer();
+        return data.has(BACKPACK_KEY, PersistentDataType.STRING);
     }
 
     public void saveBackpack(ItemStack headItem, Inventory inventory) {
@@ -95,7 +91,7 @@ public class MCEngineBackPackApi {
         PersistentDataContainer data = meta.getPersistentDataContainer();
         String serializedData = serializeInventory(inventory.getContents());
         if (serializedData != null && !serializedData.isEmpty()) {
-            data.set(new NamespacedKey(plugin, BACKPACK_DATA_KEY), PersistentDataType.STRING, serializedData);
+            data.set(BACKPACK_DATA_KEY, PersistentDataType.STRING, serializedData);
         }
 
         headItem.setItemMeta(meta);
