@@ -10,12 +10,18 @@ version = project.findProperty("${project.name}-version") ?: 'unspecified'
 group = 'io.github.mcengine'
 
 ext {
+    /* Name */
+    git_user_name = System.getenv('GIT_USER_NAME') ?: 'null'
     git_organization_name = System.getenv('GIT_ORGANIZATION_NAME') ?: 'MCEngine'
     git_repository_name = System.getenv('GIT_REPOSITORY_NAME') ?: 'backpack'
-    git_user_name = System.getenv('GIT_USER_NAME') ?: 'null'
+
+    /* Token */
     git_user_token = System.getenv('GIT_USER_TOKEN') ?: 'null'
-    git_repository_token = System.getenv('GIT_REPOSITORY_TOKEN') ?: 'null'
     git_organization_token = System.getenv('GIT_ORGANIZATION_TOKEN') ?: 'null'
+    git_repository_token = System.getenv('GIT_REPOSITORY_TOKEN') ?: 'null'
+
+    /* Project Information */
+    jarName = System.getenv('PROJECT_NAME') ?: 'MCEngineBackPack'
 }
 
 springBoot {
@@ -161,7 +167,7 @@ dependencies {
 shadowJar {
     version = version
     archiveClassifier = null
-    archiveBaseName = 'MCEngineBackPack'
+    archiveBaseName = project.jarName
 
     manifest {
         attributes 'Main-Class': 'io.github.mcengine.app.backpack.BackpackApplication'
