@@ -135,7 +135,7 @@ subprojects {
 
                         developers {
                             developer {
-                                id = 'JetsadaWijit'
+                                id = 'jetsadawijit'
                                 name = 'Jetsada Wijit'
                                 email = 'jetsadawijit@outlook.com'
                                 url = 'https://jetsadawijit.github.io'
