@@ -8,13 +8,12 @@ import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 
@@ -24,7 +23,7 @@ import org.bukkit.util.io.BukkitObjectOutputStream;
  */
 public class MCEngineBackPackApi {
 
-    private final JavaPlugin plugin;
+    private final Plugin plugin;
 
     // NamespacedKey constants
     private final NamespacedKey BACKPACK_KEY;
@@ -37,7 +36,7 @@ public class MCEngineBackPackApi {
      *
      * @param plugin The JavaPlugin instance.
      */
-    public MCEngineBackPackApi(JavaPlugin plugin) {
+    public MCEngineBackPackApi(Plugin plugin) {
         this.plugin = plugin;
         this.BACKPACK_KEY = new NamespacedKey("mcengine", "backpack");
         this.BACKPACK_DATA_KEY = new NamespacedKey("mcengine", "backpack_data");
