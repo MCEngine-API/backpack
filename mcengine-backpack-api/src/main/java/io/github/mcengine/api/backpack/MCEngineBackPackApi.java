@@ -1,4 +1,4 @@
-package io.github.mcengine.api;
+package io.github.mcengine.api.backpack;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
