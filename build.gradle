@@ -1,31 +1,27 @@
 plugins {
-    id 'org.springframework.boot' version '3.4.5'
-    id 'io.spring.dependency-management' version '1.1.7'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'java'
-    id 'maven-publish'
 }
 
-version = project.findProperty("${project.name}-version") ?: 'unspecified'
+// Set project version using a property, defaulting to 'unspecified' if not found
+version = project.properties[project.name + '.version'] ?: 'undefined'
 group = 'io.github.mcengine'
 
 ext {
-    /* Name */
-    git_user_name = System.getenv('GIT_USER_NAME') ?: 'null'
-    git_organization_name = System.getenv('GIT_ORGANIZATION_NAME') ?: 'MCEngine'
-    git_repository_name = System.getenv('GIT_REPOSITORY_NAME') ?: 'backpack'
+    // User
+    git_user_name = System.getenv('GIT_USER_NAME') ?: ''
+    git_user_token = System.getenv('GIT_USER_TOKEN') ?: ''
 
-    /* Token */
-    git_user_token = System.getenv('GIT_USER_TOKEN') ?: 'null'
-    git_organization_token = System.getenv('GIT_ORGANIZATION_TOKEN') ?: 'null'
-    git_repository_token = System.getenv('GIT_REPOSITORY_TOKEN') ?: 'null'
+    // Organization
+    git_organization_name = System.getenv('GIT_ORGANIZATION_NAME') ?: 'MCEngine'
+    git_organization_token = System.getenv('GIT_ORGANIZATION_TOKEN') ?: ''
+
+    // Repository
+    git_repository_name = System.getenv('GIT_REPOSITORY_NAME') ?: 'backpack-api'
+    git_repository_token = System.getenv('GIT_REPOSITORY_TOKEN') ?: ''
 
     /* Project Information */
     jarName = System.getenv('PROJECT_NAME') ?: 'MCEngineBackPack'
-}
-
-springBoot {
-    mainClass = 'io.github.mcengine.app.backpack.BackpackApplication'
 }
 
 allprojects {
@@ -39,83 +35,58 @@ allprojects {
         mavenLocal()
 
         maven {
-            url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-
-            // As of Gradle 5.1, you can limit this to only those
-            // dependencies you expect from it
+            url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots'
             content {
                 includeGroup 'org.bukkit'
                 includeGroup 'org.spigotmc'
             }
         }
-        maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
-        maven { url = 'https://oss.sonatype.org/content/repositories/central' }
 
-        // HeadDatabaseAPI
-        maven { url = 'https://repo.codemc.org/repository/maven-public' }
+        maven {
+            name = "papermc"
+            url = 'https://repo.papermc.io/repository/maven-public/'
+        }
+
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url 'https://oss.sonatype.org/content/repositories/central' }
+
+        maven {
+            url = uri('https://maven.pkg.github.com/MCEngine/mcengine')
+            credentials {
+                username = project.git_user_name ?: 'null'
+                password = project.git_user_token ?: 'null'
+            }
+        }
     }
 }
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'com.github.johnrengelman.shadow'
 
-    // Disable the 'jar' task if needed
+    version = project.properties[project.name + '.version'] ?: 'undefined'
+
     tasks.named('jar').configure {
         enabled = false
     }
 
-    def excludeBuildProjects = [':server']
-    if (project.path in excludeBuildProjects) {
-        tasks.matching { it.name == 'shadowJar' }.configureEach {
-            enabled = false
-        }
+    tasks.named('shadowJar').configure {
+        archiveClassifier = null
     }
 
-    // Get submodules info, ensure version property is not null
-    version = project.findProperty("${project.name}-version") ?: 'unspecified'
-
-	shadowJar {
-		archiveClassifier = null
-
-        // Change the JAR name if path starts with 'server:{sub-projectName}'
-        if (project.path.startsWith(':server') || project.name == 'common') {
-            archiveBaseName = "MCEngineBackPack-${project.name}"
-        } else {
-            archiveBaseName = project.name
-        }
-	}
-
-    if (project.path.startsWith(':server:')) {
-        dependencies {
-            implementation project(path: ':mcengine-backpack-api', configuration: 'shadow')
-            implementation project(path: ':common', configuration: 'shadow')
-        }
-    }
-
-    // Bukkit server specific configuration
-    if (project.name == 'spigotmc') {
-        processResources {
-            def props = [version: version]
-            inputs.properties(props)
-            filteringCharset 'UTF-8'
-            filesMatching('plugin.yml') {
-                expand(props)
-            }
-        }
-    }
-
-    if (project.name == 'mcengine-backpack-api') {
+    if (project.path == ":mcengine-backpack-api") {
         apply plugin: 'maven-publish'
+
         publishing {
             repositories {
                 maven {
                     name = 'GitHubPackages'
                     url = uri("https://maven.pkg.github.com/${project.git_organization_name}/${project.git_repository_name}")
                     credentials {
-                        username = System.getenv(project.git_user_name)
-                        password = System.getenv(project.git_user_token)
-                                ?: System.getenv(project.git_repository_token)
-                                ?: System.getenv(project.git_organization_token)
+                        username = project.git_user_name
+                        password = project.git_user_token
+                                ?: project.git_repository_token
+                                ?: project.git_organization_token
                     }
                 }
             }
@@ -124,21 +95,22 @@ subprojects {
                     artifact(tasks.named('shadowJar').get())
 
                     pom {
-                        name = 'MCEnginebackpack'
-                        url = "https://github.com/${project.git_organization_name}/${project.git_repository_name}"
+                        name.set(project.jarName)
+                        description.set("The ${project.jarName} API is designed for use by addons.")
+                        url.set("https://github.com/${project.git_organization_name}/${project.git_repository_name}")
 
                         scm {
-                            connection = "scm:git:git://github.com/${project.git_organization_name}/${project.git_repository_name}.git"
-                            developerConnection = "scm:git:ssh://github.com:${project.git_organization_name}/${project.git_repository_name}.git"
-                            url = "https://github.com/${project.git_organization_name}/${project.git_repository_name}"
+                            connection.set("scm:git:git://github.com/${project.git_organization_name}/${project.git_repository_name}.git")
+                            developerConnection.set("scm:git:ssh://github.com:${project.git_organization_name}/${project.git_repository_name}.git")
+                            url.set("https://github.com/${project.git_organization_name}/${project.git_repository_name}")
                         }
 
                         developers {
                             developer {
-                                id = 'jetsadawijit'
-                                name = 'Jetsada Wijit'
-                                email = 'jetsadawijit@outlook.com'
-                                url = 'https://jetsadawijit.github.io'
+                                id.set('jetsadawijit')
+                                name.set('Jetsada Wijit')
+                                email.set('jetsadawijit@outlook.com')
+                                url.set('https://jetsadawijit.github.io')
                             }
                         }
                     }
@@ -149,34 +121,17 @@ subprojects {
 }
 
 dependencies {
-    compileOnly 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.springframework.boot:spring-boot-starter-thymeleaf'
-
-    implementation project(path: ':mcengine-backpack-api', configuration: 'shadow')
-    implementation project(path: ':common', configuration: 'shadow')
-
-    // Dynamically include all server projects
-    rootProject.subprojects.each { subproject ->
-        if (subproject.name != 'mcengine-backpack-api' && subproject.name != 'common') {
-            def serverProjectPath = subproject.path.startsWith(':server') ? subproject.path : ":server:${subproject.name}"
-            implementation project(path: serverProjectPath, configuration: 'shadow')
-        }
-    }
+    implementation project(path: ":mcengine-backpack-api", configuration: 'shadow')
 }
 
 shadowJar {
     version = version
     archiveClassifier = null
     archiveBaseName = project.jarName
-
-    manifest {
-        attributes 'Main-Class': 'io.github.mcengine.app.backpack.BackpackApplication'
-    }
-    mergeServiceFiles()
 }
 
-// Disable the 'jar' task if needed
 tasks.named('jar').configure {
     enabled = false
 }
+
 build.dependsOn(shadowJar)

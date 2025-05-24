@@ -1,14 +1,7 @@
 rootProject.name = 'mcengine-backpack'
 
-def coreProjects = [
-    'mcengine-backpack-api',
-    'common'
-]
-
-def serverProjects = ['spigotmc']
-
-// Include core projects
-coreProjects.each { include it }
-
-// Dynamically include server projects
-serverProjects.each { include "server:${it}" }
+// Define base directories for subprojects
+def coreProjects = ['mcengine-backpack-api']
+coreProjects.each {
+    include ":$it"
+}
