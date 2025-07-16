@@ -1,127 +1,64 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'maven-publish'
 }
 
-// Set project version using a property, defaulting to 'unspecified' if not found
-version = project.properties[project.name + '.version'] ?: 'undefined'
+// Set project version using a property
+version = project.properties[project.name + '.version']
 group = 'io.github.mcengine'
 
 ext {
     // User
-    git_user_name = System.getenv('GIT_USER_NAME') ?: ''
-    git_user_token = System.getenv('GIT_USER_TOKEN') ?: ''
+    user_git_name = System.getenv('USER_GIT_NAME')
+
+    // GitHub
+    user_github_token = System.getenv('USER_GITHUB_TOKEN')
 
     // Organization
-    git_organization_name = System.getenv('GIT_ORGANIZATION_NAME') ?: 'MCEngine'
-    git_organization_token = System.getenv('GIT_ORGANIZATION_TOKEN') ?: ''
+    organization_name = System.getenv('ORGANIZATION_NAME') ?: 'MCEngine'
+    organization_token = System.getenv('ORGANIZATION_TOKEN')
 
     // Repository
-    git_repository_name = System.getenv('GIT_REPOSITORY_NAME') ?: 'backpack-api'
-    git_repository_token = System.getenv('GIT_REPOSITORY_TOKEN') ?: ''
+    repository_name = System.getenv('REPOSITORY_NAME') ?: 'backpack-api'
+    repository_token = System.getenv('REPOSITORY_TOKEN')
 
-    /* Project Information */
+    // Project Information
     jarName = System.getenv('PROJECT_NAME') ?: 'MCEngineBackPack'
 }
 
-allprojects {
-    group = 'io.github.mcengine'
+repositories {
+    mavenCentral()
+    mavenLocal()
 
-    apply plugin: 'java'
-    apply plugin: 'com.github.johnrengelman.shadow'
-
-    repositories {
-        mavenCentral()
-        mavenLocal()
-
-        maven {
-            url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots'
-            content {
-                includeGroup 'org.bukkit'
-                includeGroup 'org.spigotmc'
-            }
-        }
-
-        maven {
-            name = "papermc"
-            url = 'https://repo.papermc.io/repository/maven-public/'
-        }
-
-        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-        maven { url 'https://oss.sonatype.org/content/repositories/central' }
-
-        maven {
-            url = uri('https://maven.pkg.github.com/MCEngine/mcengine')
-            credentials {
-                username = project.git_user_name ?: 'null'
-                password = project.git_user_token ?: 'null'
-            }
+    maven {
+        url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots'
+        content {
+            includeGroup 'org.bukkit'
+            includeGroup 'org.spigotmc'
         }
     }
-}
 
-subprojects {
-    apply plugin: 'java'
-    apply plugin: 'com.github.johnrengelman.shadow'
-
-    version = project.properties[project.name + '.version'] ?: 'undefined'
-
-    tasks.named('jar').configure {
-        enabled = false
+    maven {
+        name = "papermc"
+        url = 'https://repo.papermc.io/repository/maven-public/'
     }
 
-    tasks.named('shadowJar').configure {
-        archiveClassifier = null
-    }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://oss.sonatype.org/content/repositories/central' }
 
-    if (project.path == ":mcengine-backpack-api") {
-        apply plugin: 'maven-publish'
-
-        publishing {
-            repositories {
-                maven {
-                    name = 'GitHubPackages'
-                    url = uri("https://maven.pkg.github.com/${project.git_organization_name}/${project.git_repository_name}")
-                    credentials {
-                        username = project.git_user_name
-                        password = project.git_user_token
-                                ?: project.git_repository_token
-                                ?: project.git_organization_token
-                    }
-                }
-            }
-            publications {
-                mavenJava(MavenPublication) {
-                    artifact(tasks.named('shadowJar').get())
-
-                    pom {
-                        name.set(project.jarName)
-                        description.set("The ${project.jarName} API is designed for use by addons.")
-                        url.set("https://github.com/${project.git_organization_name}/${project.git_repository_name}")
-
-                        scm {
-                            connection.set("scm:git:git://github.com/${project.git_organization_name}/${project.git_repository_name}.git")
-                            developerConnection.set("scm:git:ssh://github.com:${project.git_organization_name}/${project.git_repository_name}.git")
-                            url.set("https://github.com/${project.git_organization_name}/${project.git_repository_name}")
-                        }
-
-                        developers {
-                            developer {
-                                id.set('jetsadawijit')
-                                name.set('Jetsada Wijit')
-                                email.set('jetsadawijit@outlook.com')
-                                url.set('https://jetsadawijit.github.io')
-                            }
-                        }
-                    }
-                }
-            }
+    maven {
+        url = uri("https://maven.pkg.github.com/${project.organization_name}/${project.repository_name}")
+        credentials {
+            username = project.user_git_name
+            password = project.user_github_token ?: project.repository_token ?: project.organization_token
         }
     }
 }
 
 dependencies {
-    implementation project(path: ":mcengine-backpack-api", configuration: 'shadow')
+    compileOnly 'org.spigotmc:spigot-api:1.21.7-R0.1-SNAPSHOT'
+    compileOnly 'com.arcaniax:HeadDatabase-API:1.3.2'
 }
 
 shadowJar {
@@ -132,6 +69,47 @@ shadowJar {
 
 tasks.named('jar').configure {
     enabled = false
+}
+
+publishing {
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url = uri("https://maven.pkg.github.com/${project.organization_name}/${project.repository_name}")
+            credentials {
+                username = project.user_git_name
+                password = project.user_github_token ?: project.repository_token ?: project.organization_token
+            }
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            artifact tasks.named('shadowJar').get()
+            artifactId = 'backpack-api'
+
+            pom {
+                name.set(project.jarName)
+                description.set("The ${project.jarName} API is designed for use by Backpack plugin.")
+                url.set("https://github.com/${project.organization_name}/${project.repository_name}")
+
+                scm {
+                    connection.set("scm:git:git://github.com/${project.organization_name}/${project.repository_name}.git")
+                    developerConnection.set("scm:git:ssh://github.com:${project.organization_name}/${project.repository_name}.git")
+                    url.set("https://github.com/${project.organization_name}/${project.repository_name}")
+                }
+
+                developers {
+                    developer {
+                        id.set('jetsadawijit')
+                        name.set('Jetsada Wijit')
+                        email.set('jetsadawijit@outlook.com')
+                        url.set('https://jetsadawijit.github.io')
+                    }
+                }
+            }
+        }
+    }
 }
 
 build.dependsOn(shadowJar)
