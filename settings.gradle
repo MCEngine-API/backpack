@@ -1,7 +1,1 @@
 rootProject.name = 'mcengine-backpack'
-
-// Define base directories for subprojects
-def coreProjects = ['mcengine-backpack-api']
-coreProjects.each {
-    include ":$it"
-}
