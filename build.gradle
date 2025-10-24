@@ -13,6 +13,7 @@ ext {
     user_git_name = System.getenv('USER_GIT_NAME')
 
     // GitHub
+    user_github_name = System.getenv('USER_GITHUB_NAME')
     user_github_token = System.getenv('USER_GITHUB_TOKEN')
 
     // Organization
@@ -79,7 +80,7 @@ publishing {
             name = 'GitHubPackages'
             url = uri("https://maven.pkg.github.com/${organization_name}/${repository_name}")
             credentials {
-                username = user_git_name
+                username = user_github_token_name ?: user_git_name
                 password = user_github_token ?: repository_token ?: organization_token
             }
         }
