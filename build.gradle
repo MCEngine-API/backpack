@@ -53,7 +53,7 @@ repositories {
     maven {
         url = uri("https://maven.pkg.github.com/${organization_name}/${repository_name}")
         credentials {
-            username = user_git_name
+            username = user_github_name ?: user_git_name
             password = user_github_token ?: repository_token ?: organization_token
         }
     }
@@ -80,7 +80,7 @@ publishing {
             name = 'GitHubPackages'
             url = uri("https://maven.pkg.github.com/${organization_name}/${repository_name}")
             credentials {
-                username = user_github_token_name ?: user_git_name
+                username = user_github_name ?: user_git_name
                 password = user_github_token ?: repository_token ?: organization_token
             }
         }
